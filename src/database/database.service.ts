@@ -60,4 +60,8 @@ export class DatabaseService {
   findAllTracks(): Track[] {
     return this.tracks;
   }
+
+  findTrack(trackId: string): Track | null {
+    return this.tracks.find((track) => track.id === trackId);
+  }
 }

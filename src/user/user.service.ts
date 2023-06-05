@@ -1,14 +1,9 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { User, UserWithoutPassword } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { removeProperty } from '../util/remove-property.util';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { validate } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -55,11 +50,5 @@ export class UserService {
 
   private removePasswordFromUser(user: User): UserWithoutPassword {
     return removeProperty(user, 'password');
-  }
-
-  public assertValidId(userId: string): void {
-    const isValid = validate(userId);
-
-    if (!isValid) throw new BadRequestException('Invalid user ID');
   }
 }

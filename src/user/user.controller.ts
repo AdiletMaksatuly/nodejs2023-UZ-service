@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { UserWithoutPassword } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { assertValidUuid } from '../util/assert-valid-uuid.util';
 
 @Controller('user')
 export class UserController {
@@ -25,7 +26,7 @@ export class UserController {
 
   @Get(':id')
   public getUser(@Param('id') userId: string): UserWithoutPassword {
-    this.userService.assertValidId(userId);
+    assertValidUuid(userId);
 
     const user = this.userService.getUser(userId);
 
@@ -46,7 +47,7 @@ export class UserController {
     @Param('id') userId: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): UserWithoutPassword {
-    this.userService.assertValidId(userId);
+    assertValidUuid(userId);
 
     const user = this.userService.getUser(userId);
 
@@ -60,7 +61,7 @@ export class UserController {
   @Delete(':id')
   @HttpCode(204)
   public deleteUser(@Param('id') userId: string): void {
-    this.userService.assertValidId(userId);
+    assertValidUuid(userId);
 
     const user = this.userService.getUser(userId);
 

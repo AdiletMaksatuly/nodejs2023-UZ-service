@@ -9,4 +9,8 @@ export class TrackService {
   getTracks(): Track[] {
     return this.databaseService.findAllTracks();
   }
+
+  getTrack(trackId: string): Track {
+    return this.databaseService.findTrack(trackId);
+  }
 }
