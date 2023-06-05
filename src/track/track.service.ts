@@ -23,4 +23,8 @@ export class TrackService {
   updateTrack(trackId: string, updateTrackDto: UpdateTrackDto): Track {
     return this.databaseService.updateTrack(trackId, updateTrackDto);
   }
+
+  deleteTrack(trackId: string): void {
+    this.databaseService.deleteTrack(trackId);
+  }
 }

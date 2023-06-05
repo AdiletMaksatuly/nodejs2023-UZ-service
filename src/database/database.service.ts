@@ -98,4 +98,8 @@ export class DatabaseService {
 
     return updatedTrack;
   }
+
+  deleteTrack(trackId: string): void {
+    this.tracks = this.tracks.filter((track) => track.id !== trackId);
+  }
 }

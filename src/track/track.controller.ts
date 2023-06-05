@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
@@ -54,5 +56,19 @@ export class TrackController {
     }
 
     return this.trackService.updateTrack(trackId, updateTrackDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  public deleteUser(@Param('id') trackId: string): void {
+    assertValidUuid(trackId);
+
+    const track = this.trackService.getTrack(trackId);
+
+    if (!track) {
+      throw new NotFoundException('Track not found');
+    }
+
+    this.trackService.deleteTrack(trackId);
   }
 }
