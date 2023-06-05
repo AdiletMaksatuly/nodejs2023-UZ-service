@@ -9,12 +9,15 @@ import { UpdateTrackDto } from '../track/dto/update-track.dto';
 import { Artist } from '../artist/artist.interface';
 import { CreateArtistDto } from '../artist/dto/create-artist.dto';
 import { UpdateArtistDto } from '../artist/dto/update-artist.dto';
+import { Album } from '../album/album.interface';
+import { CreateAlbumDto } from '../album/dto/create-album.dto';
 
 @Injectable()
 export class DatabaseService {
   private users: User[] = [];
   private tracks: Track[] = [];
   private artists: Artist[] = [];
+  private albums: Album[] = [];
 
   findAllUsers(): User[] {
     return this.users;
@@ -147,5 +150,48 @@ export class DatabaseService {
 
   deleteArtist(artistId: string): void {
     this.artists = this.artists.filter((artist) => artist.id !== artistId);
+  }
+
+  findAllAlbums(): Album[] {
+    return this.albums;
+  }
+
+  findAlbum(albumId: string): Album | null {
+    return this.albums.find((album) => album.id === albumId);
+  }
+
+  createAlbum(createAlbumDto: CreateAlbumDto): Album {
+    const createdAlbum: Album = {
+      ...createAlbumDto,
+      id: v4(),
+      artistId: createAlbumDto.artistId ?? null,
+    };
+
+    this.albums = [...this.albums, createdAlbum];
+
+    return createdAlbum;
+  }
+
+  updateAlbum(albumId: string, updateAlbumDto: CreateAlbumDto): Album {
+    const album = this.findAlbum(albumId);
+
+    if (!album) return null;
+
+    const updatedAlbum: Album = {
+      ...album,
+      ...updateAlbumDto,
+    };
+
+    this.albums = this.albums.map((album) => {
+      if (album.id === albumId) return updatedAlbum;
+
+      return album;
+    });
+
+    return updatedAlbum;
+  }
+
+  deleteAlbum(albumId: string): void {
+    this.albums = this.albums.filter((album) => album.id !== albumId);
   }
 }
