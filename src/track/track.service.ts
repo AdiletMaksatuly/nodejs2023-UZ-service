@@ -25,6 +25,7 @@ export class TrackService {
   }
 
   deleteTrack(trackId: string): void {
+    this.databaseService.removeTrackFromFavs(trackId);
     this.databaseService.deleteTrack(trackId);
   }
 }

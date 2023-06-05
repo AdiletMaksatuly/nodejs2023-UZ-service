@@ -46,6 +46,7 @@ export class ArtistService {
       }
     });
 
+    this.databaseService.removeArtistFromFavs(artistId);
     this.databaseService.deleteArtist(artistId);
   }
 }

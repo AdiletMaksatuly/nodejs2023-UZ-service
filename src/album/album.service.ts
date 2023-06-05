@@ -36,6 +36,8 @@ export class AlbumService {
       }
     });
 
+    this.databaseService.removeAlbumFromFavs(albumId);
+
     this.databaseService.deleteAlbum(albumId);
   }
 }
