@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './user.interface';
+import { User, UserWithoutPassword } from './user.interface';
 import { validate } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -17,12 +17,12 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  public getAllUsers(): User[] {
+  public getAllUsers(): UserWithoutPassword[] {
     return this.userService.getUsers();
   }
 
   @Get(':id')
-  public getUser(@Param('id') userId: string): User {
+  public getUser(@Param('id') userId: string): UserWithoutPassword {
     const isValid = validate(userId);
 
     if (!isValid) throw new BadRequestException('Invalid user ID');
@@ -37,7 +37,7 @@ export class UserController {
   }
 
   @Post()
-  public createUser(@Body() createUserDto: CreateUserDto): User {
+  public createUser(@Body() createUserDto: CreateUserDto): UserWithoutPassword {
     return this.userService.createUser(createUserDto);
   }
 }
