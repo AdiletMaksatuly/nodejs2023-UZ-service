@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { User } from './user.interface';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -12,5 +13,9 @@ export class UserService {
 
   getUser(userId: string): User | null {
     return this.databaseService.findUser(userId);
+  }
+
+  createUser(createUserDto: CreateUserDto): User {
+    return this.databaseService.createUser(createUserDto);
   }
 }

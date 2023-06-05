@@ -1,13 +1,16 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
+  Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.interface';
 import { validate } from 'uuid';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -31,5 +34,10 @@ export class UserController {
     }
 
     return user;
+  }
+
+  @Post()
+  public createUser(@Body() createUserDto: CreateUserDto): User {
+    return this.userService.createUser(createUserDto);
   }
 }
