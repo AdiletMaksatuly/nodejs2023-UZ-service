@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { User, UserWithoutPassword } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { removeProperty } from '../util/remove-property.util';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,21 @@ export class UserService {
   createUser(createUserDto: CreateUserDto): UserWithoutPassword {
     return this.removePasswordFromUser(
       this.databaseService.createUser(createUserDto),
+    );
+  }
+
+  updateUser(
+    userId: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): UserWithoutPassword {
+    const user = this.databaseService.findUser(userId);
+
+    if (user.password !== updatePasswordDto.oldPassword) {
+      throw new ForbiddenException('Invalid old password');
+    }
+
+    return this.removePasswordFromUser(
+      this.databaseService.updateUser(userId, updatePasswordDto),
     );
   }
 

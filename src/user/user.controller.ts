@@ -6,11 +6,13 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, UserWithoutPassword } from './user.interface';
 import { validate } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -39,5 +41,23 @@ export class UserController {
   @Post()
   public createUser(@Body() createUserDto: CreateUserDto): UserWithoutPassword {
     return this.userService.createUser(createUserDto);
+  }
+
+  @Put(':id')
+  public updateUser(
+    @Param('id') userId: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ): UserWithoutPassword {
+    const isValid = validate(userId);
+
+    if (!isValid) throw new BadRequestException('Invalid user ID');
+
+    const user = this.userService.getUser(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.userService.updateUser(userId, updatePasswordDto);
   }
 }

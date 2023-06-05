@@ -13,3 +13,8 @@ export interface CreateUser {
   login: string;
   password: string;
 }
+
+export interface UpdatePassword {
+  oldPassword: string;
+  newPassword: string;
+}
