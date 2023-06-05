@@ -3,3 +3,13 @@ export interface Artist {
   name: string;
   grammy: boolean;
 }
+
+export interface CreateArtist {
+  name: string;
+  grammy: boolean;
+}
+
+export interface UpdateArtist {
+  name: string;
+  grammy: boolean;
+}

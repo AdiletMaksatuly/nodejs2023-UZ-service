@@ -7,6 +7,8 @@ import { Track } from 'src/track/track.interface';
 import { CreateTrackDto } from '../track/dto/create-track.dto';
 import { UpdateTrackDto } from '../track/dto/update-track.dto';
 import { Artist } from '../artist/artist.interface';
+import { CreateArtistDto } from '../artist/dto/create-artist.dto';
+import { UpdateArtistDto } from '../artist/dto/update-artist.dto';
 
 @Injectable()
 export class DatabaseService {
@@ -107,5 +109,43 @@ export class DatabaseService {
 
   findAllArtists(): Artist[] {
     return this.artists;
+  }
+
+  findArtist(artistId: string): Artist | null {
+    return this.artists.find((artist) => artist.id === artistId);
+  }
+
+  createArtist(createArtistDto: CreateArtistDto): Artist {
+    const createdArtist: Artist = {
+      ...createArtistDto,
+      id: v4(),
+    };
+
+    this.artists = [...this.artists, createdArtist];
+
+    return createdArtist;
+  }
+
+  updateArtist(artistId: string, updateArtistDto: UpdateArtistDto): Artist {
+    const artist = this.findArtist(artistId);
+
+    if (!artist) return null;
+
+    const updatedArtist: Artist = {
+      ...artist,
+      ...updateArtistDto,
+    };
+
+    this.artists = this.artists.map((artist) => {
+      if (artist.id === artistId) return updatedArtist;
+
+      return artist;
+    });
+
+    return updatedArtist;
+  }
+
+  deleteArtist(artistId: string): void {
+    this.artists = this.artists.filter((artist) => artist.id !== artistId);
   }
 }
