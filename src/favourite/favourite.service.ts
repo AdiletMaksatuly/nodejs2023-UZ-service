@@ -9,4 +9,12 @@ export class FavouriteService {
   getAllFavs(): FavouritesResponse {
     return this.databaseService.findAllFavs();
   }
+
+  addTrackToFavs(trackId: string): void {
+    this.databaseService.addTrackToFavs(trackId);
+  }
+
+  removeTrackFromFavs(trackId: string): void {
+    this.databaseService.removeTrackFromFavs(trackId);
+  }
 }

@@ -205,4 +205,20 @@ export class DatabaseService {
   findAllFavs(): FavouritesResponse {
     return this.favourites;
   }
+
+  addTrackToFavs(trackId: string): void {
+    const trackToBeAdded = this.findTrack(trackId);
+
+    this.favourites = {
+      ...this.favourites,
+      tracks: [...this.favourites.tracks, trackToBeAdded],
+    };
+  }
+
+  removeTrackFromFavs(trackId: string): void {
+    this.favourites = {
+      ...this.favourites,
+      tracks: this.favourites.tracks.filter((track) => track.id !== trackId),
+    };
+  }
 }
