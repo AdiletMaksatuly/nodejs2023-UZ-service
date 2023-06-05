@@ -25,6 +25,17 @@ export class AlbumService {
   }
 
   deleteAlbum(albumId: string): void {
+    const tracks = this.databaseService.findAllTracks();
+
+    tracks.forEach((track) => {
+      if (track.albumId === albumId) {
+        this.databaseService.updateTrack(track.id, {
+          ...track,
+          albumId: null,
+        });
+      }
+    });
+
     this.databaseService.deleteAlbum(albumId);
   }
 }
