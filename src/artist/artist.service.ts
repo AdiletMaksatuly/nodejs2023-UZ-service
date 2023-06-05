@@ -26,11 +26,21 @@ export class ArtistService {
 
   deleteArtist(artistId: string): void {
     const tracks = this.databaseService.findAllTracks();
+    const albums = this.databaseService.findAllAlbums();
 
     tracks.forEach((track) => {
       if (track.artistId === artistId) {
         this.databaseService.updateTrack(track.id, {
           ...track,
+          artistId: null,
+        });
+      }
+    });
+
+    albums.forEach((album) => {
+      if (album.artistId === artistId) {
+        this.databaseService.updateAlbum(album.id, {
+          ...album,
           artistId: null,
         });
       }
