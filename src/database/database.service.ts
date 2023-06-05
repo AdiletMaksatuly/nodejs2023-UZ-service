@@ -8,4 +8,8 @@ export class DatabaseService {
   findAllUsers(): User[] {
     return this.users;
   }
+
+  findUser(userId: string): User | null {
+    return this.users.find((user) => user.id === userId);
+  }
 }
