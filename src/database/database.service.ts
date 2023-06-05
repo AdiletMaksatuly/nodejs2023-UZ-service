@@ -4,6 +4,7 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { v4 } from 'uuid';
 import { UpdatePasswordDto } from '../user/dto/update-password.dto';
 import { Track } from 'src/track/track.interface';
+import { CreateTrackDto } from '../track/dto/create-track.dto';
 
 @Injectable()
 export class DatabaseService {
@@ -63,5 +64,18 @@ export class DatabaseService {
 
   findTrack(trackId: string): Track | null {
     return this.tracks.find((track) => track.id === trackId);
+  }
+
+  createTrack(createTrackDto: CreateTrackDto): Track {
+    const createdTrack: Track = {
+      ...createTrackDto,
+      artistId: createTrackDto.artistId ?? null,
+      albumId: createTrackDto.albumId ?? null,
+      id: v4(),
+    };
+
+    this.tracks = [...this.tracks, createdTrack];
+
+    return createdTrack;
   }
 }
