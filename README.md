@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/AdiletMaksatuly/nodejs2023-UZ-service.git
 ```
 
 ## Installing NPM modules
