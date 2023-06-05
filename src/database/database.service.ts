@@ -6,11 +6,13 @@ import { UpdatePasswordDto } from '../user/dto/update-password.dto';
 import { Track } from 'src/track/track.interface';
 import { CreateTrackDto } from '../track/dto/create-track.dto';
 import { UpdateTrackDto } from '../track/dto/update-track.dto';
+import { Artist } from '../artist/artist.interface';
 
 @Injectable()
 export class DatabaseService {
   private users: User[] = [];
   private tracks: Track[] = [];
+  private artists: Artist[] = [];
 
   findAllUsers(): User[] {
     return this.users;
@@ -101,5 +103,9 @@ export class DatabaseService {
 
   deleteTrack(trackId: string): void {
     this.tracks = this.tracks.filter((track) => track.id !== trackId);
+  }
+
+  findAllArtists(): Artist[] {
+    return this.artists;
   }
 }
