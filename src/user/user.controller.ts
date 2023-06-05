@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -25,9 +26,7 @@ export class UserController {
 
   @Get(':id')
   public getUser(@Param('id') userId: string): UserWithoutPassword {
-    const isValid = validate(userId);
-
-    if (!isValid) throw new BadRequestException('Invalid user ID');
+    this.userService.assertValidId(userId);
 
     const user = this.userService.getUser(userId);
 
@@ -48,9 +47,7 @@ export class UserController {
     @Param('id') userId: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): UserWithoutPassword {
-    const isValid = validate(userId);
-
-    if (!isValid) throw new BadRequestException('Invalid user ID');
+    this.userService.assertValidId(userId);
 
     const user = this.userService.getUser(userId);
 
