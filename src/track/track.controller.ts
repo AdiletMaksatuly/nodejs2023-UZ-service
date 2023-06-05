@@ -60,7 +60,7 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(204)
-  public deleteUser(@Param('id') trackId: string): void {
+  public deleteTrack(@Param('id') trackId: string): void {
     assertValidUuid(trackId);
 
     const track = this.trackService.getTrack(trackId);

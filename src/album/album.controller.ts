@@ -60,7 +60,7 @@ export class AlbumController {
 
   @Delete(':id')
   @HttpCode(204)
-  public deleteUser(@Param('id') albumId: string): void {
+  public deleteAlbum(@Param('id') albumId: string): void {
     assertValidUuid(albumId);
 
     const album = this.albumService.getAlbum(albumId);
