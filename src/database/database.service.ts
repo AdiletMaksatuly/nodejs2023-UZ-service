@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { UpdatePasswordDto } from '../user/dto/update-password.dto';
 import { Track } from 'src/track/track.interface';
 import { CreateTrackDto } from '../track/dto/create-track.dto';
+import { UpdateTrackDto } from '../track/dto/update-track.dto';
 
 @Injectable()
 export class DatabaseService {
@@ -77,5 +78,24 @@ export class DatabaseService {
     this.tracks = [...this.tracks, createdTrack];
 
     return createdTrack;
+  }
+
+  updateTrack(trackId: string, updateTrackDto: UpdateTrackDto): Track {
+    const track = this.findTrack(trackId);
+
+    if (!track) return null;
+
+    const updatedTrack: Track = {
+      ...track,
+      ...updateTrackDto,
+    };
+
+    this.tracks = this.tracks.map((track) => {
+      if (track.id === trackId) return updatedTrack;
+
+      return track;
+    });
+
+    return updatedTrack;
   }
 }

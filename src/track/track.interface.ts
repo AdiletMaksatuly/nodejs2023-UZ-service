@@ -12,3 +12,10 @@ export interface CreateTrack {
   albumId: string | null;
   duration: number;
 }
+
+export interface UpdateTrack {
+  name: string;
+  artistId: string | null;
+  albumId: string | null;
+  duration: number;
+}
