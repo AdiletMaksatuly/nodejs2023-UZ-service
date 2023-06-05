@@ -11,6 +11,7 @@ import { CreateArtistDto } from '../artist/dto/create-artist.dto';
 import { UpdateArtistDto } from '../artist/dto/update-artist.dto';
 import { Album } from '../album/album.interface';
 import { CreateAlbumDto } from '../album/dto/create-album.dto';
+import { FavouritesResponse } from '../favourite/favourite.interface';
 
 @Injectable()
 export class DatabaseService {
@@ -18,6 +19,12 @@ export class DatabaseService {
   private tracks: Track[] = [];
   private artists: Artist[] = [];
   private albums: Album[] = [];
+
+  private favourites: FavouritesResponse = {
+    artists: [],
+    albums: [],
+    tracks: [],
+  };
 
   findAllUsers(): User[] {
     return this.users;
@@ -193,5 +200,9 @@ export class DatabaseService {
 
   deleteAlbum(albumId: string): void {
     this.albums = this.albums.filter((album) => album.id !== albumId);
+  }
+
+  findAllFavs(): FavouritesResponse {
+    return this.favourites;
   }
 }
