@@ -50,4 +50,8 @@ export class DatabaseService {
 
     return updatedUser;
   }
+
+  deleteUser(userId: string): void {
+    this.users = this.users.filter((user) => user.id !== userId);
+  }
 }

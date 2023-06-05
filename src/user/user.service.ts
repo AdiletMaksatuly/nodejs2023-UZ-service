@@ -49,6 +49,10 @@ export class UserService {
     );
   }
 
+  deleteUser(userId: string): void {
+    this.databaseService.deleteUser(userId);
+  }
+
   private removePasswordFromUser(user: User): UserWithoutPassword {
     return removeProperty(user, 'password');
   }
