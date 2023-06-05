@@ -221,4 +221,38 @@ export class DatabaseService {
       tracks: this.favourites.tracks.filter((track) => track.id !== trackId),
     };
   }
+
+  addAlbumToFavs(albumId: string): void {
+    const albumToBeAdded = this.findAlbum(albumId);
+
+    this.favourites = {
+      ...this.favourites,
+      albums: [...this.favourites.albums, albumToBeAdded],
+    };
+  }
+
+  removeAlbumFromFavs(albumId: string): void {
+    this.favourites = {
+      ...this.favourites,
+      albums: this.favourites.albums.filter((album) => album.id !== albumId),
+    };
+  }
+
+  addArtistToFavs(artistId: string): void {
+    const artistToBeAdded = this.findArtist(artistId);
+
+    this.favourites = {
+      ...this.favourites,
+      artists: [...this.favourites.artists, artistToBeAdded],
+    };
+  }
+
+  removeArtistFromFavs(artistId: string): void {
+    this.favourites = {
+      ...this.favourites,
+      artists: this.favourites.artists.filter(
+        (artist) => artist.id !== artistId,
+      ),
+    };
+  }
 }

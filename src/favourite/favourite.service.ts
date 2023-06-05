@@ -17,4 +17,20 @@ export class FavouriteService {
   removeTrackFromFavs(trackId: string): void {
     this.databaseService.removeTrackFromFavs(trackId);
   }
+
+  addAlbumToFavs(albumId: string): void {
+    this.databaseService.addAlbumToFavs(albumId);
+  }
+
+  removeAlbumFromFavs(albumId: string): void {
+    this.databaseService.removeAlbumFromFavs(albumId);
+  }
+
+  addArtistToFavs(artistId: string): void {
+    this.databaseService.addArtistToFavs(artistId);
+  }
+
+  removeArtistFromFavs(artistId: string): void {
+    this.databaseService.removeArtistFromFavs(artistId);
+  }
 }
