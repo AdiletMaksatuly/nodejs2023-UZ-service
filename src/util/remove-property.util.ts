@@ -5,6 +5,7 @@ export const removeProperty = <
   obj: Obj,
   prop: Prop,
 ): Omit<Obj, Prop> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { [prop]: omit, ...rest } = obj;
 
   return rest;

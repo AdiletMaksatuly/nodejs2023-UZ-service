@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -14,7 +13,6 @@ import { UserService } from './user.service';
 import { UserWithoutPassword } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { NO_CONTENT, StatusCodes } from 'http-status-codes';
 
 @Controller('user')
 export class UserController {

@@ -3,10 +3,12 @@ import { User } from 'src/user/user.interface';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { v4 } from 'uuid';
 import { UpdatePasswordDto } from '../user/dto/update-password.dto';
+import { Track } from 'src/track/track.interface';
 
 @Injectable()
 export class DatabaseService {
   private users: User[] = [];
+  private tracks: Track[] = [];
 
   findAllUsers(): User[] {
     return this.users;
@@ -53,5 +55,9 @@ export class DatabaseService {
 
   deleteUser(userId: string): void {
     this.users = this.users.filter((user) => user.id !== userId);
+  }
+
+  findAllTracks(): Track[] {
+    return this.tracks;
   }
 }
