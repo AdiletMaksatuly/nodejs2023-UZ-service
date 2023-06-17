@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  app:
+    build:
+        context: .
+    ports:
+        - "${PORT}:${PORT}"
+    restart: always
+    env_file:
+        - .env
+    depends_on:
+      - postgres
+
+  postgres:
+    build: ./db/
+    ports:
+        - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    restart: always
+    env_file:
+        - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+volumes:
+  pgdata:
