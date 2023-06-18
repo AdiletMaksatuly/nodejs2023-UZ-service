@@ -2,24 +2,31 @@ version: "3.8"
 services:
   app:
     build:
-        context: .
+      context: .
     ports:
-        - "${PORT}:${PORT}"
+      - "${PORT}:${PORT}"
     restart: always
     env_file:
-        - .env
+      - .env
     depends_on:
       - postgres
+    networks:
+      - home-library-network
 
   postgres:
     build: ./db/
     ports:
-        - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     restart: always
     env_file:
-        - .env
+      - .env
     volumes:
       - pgdata:/var/lib/postgresql/data/
+    networks:
+      - home-library-network
 
 volumes:
   pgdata:
+networks:
+  home-library-network:
+    driver: bridge
