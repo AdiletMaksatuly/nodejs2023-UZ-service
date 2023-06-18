@@ -10,6 +10,8 @@ services:
       - .env
     depends_on:
       - postgres
+    volumes:
+      - ./src:/app/src
     networks:
       - home-library-network
 
