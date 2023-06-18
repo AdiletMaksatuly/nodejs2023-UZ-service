@@ -3,6 +3,7 @@ services:
   app:
     build:
       context: .
+    image: hunnidbands100/home-library-service:nodejs2023-uz-service-app
     ports:
       - "${PORT}:${PORT}"
     restart: always
