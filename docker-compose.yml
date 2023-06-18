@@ -22,11 +22,13 @@ services:
       - .env
     volumes:
       - pgdata:/var/lib/postgresql/data/
+      - pglogs:/logs
     networks:
       - home-library-network
 
 volumes:
   pgdata:
+  pglogs:
 networks:
   home-library-network:
     driver: bridge
