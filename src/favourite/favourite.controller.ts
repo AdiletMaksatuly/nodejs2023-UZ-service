@@ -25,97 +25,94 @@ export class FavouriteController {
   ) {}
 
   @Get()
-  getFavs(): FavouritesResponse {
+  public async getFavs(): Promise<FavouritesResponse> {
     return this.favouriteService.getAllFavs();
   }
 
   @Post('/track/:id')
-  addTrackToFavs(@Param('id') trackId: string): void {
+  public async addTrackToFavs(@Param('id') trackId: string): Promise<void> {
     assertValidUuid(trackId);
 
-    const track = this.trackService.getTrack(trackId);
+    const track = await this.trackService.getTrack(trackId);
 
     if (!track) {
-      throw new UnprocessableEntityException('Track not found');
+      throw new UnprocessableEntityException("Track doesn't exist");
     }
 
-    this.favouriteService.addTrackToFavs(trackId);
+    await this.favouriteService.addTrackToFavs(trackId);
   }
 
   @Delete('/track/:id')
   @HttpCode(204)
-  removeTrackFromFavs(@Param('id') trackId: string): void {
+  public async removeTrackFromFavs(
+    @Param('id') trackId: string,
+  ): Promise<void> {
     assertValidUuid(trackId);
 
-    const allFavs = this.favouriteService.getAllFavs();
-    const trackToBeDeleted = allFavs.tracks.find(
-      (track) => track.id === trackId,
+    const { affected } = await this.favouriteService.removeTrackFromFavs(
+      trackId,
     );
 
-    if (!trackToBeDeleted) {
-      throw new NotFoundException('Track not found');
+    if (!affected) {
+      throw new NotFoundException("Track doesn't exist");
     }
-
-    this.favouriteService.removeTrackFromFavs(trackId);
   }
 
   @Post('/album/:id')
-  addAlbumToFavs(@Param('id') albumId: string): void {
+  public async addAlbumToFavs(@Param('id') albumId: string): Promise<void> {
     assertValidUuid(albumId);
 
-    const album = this.albumService.getAlbum(albumId);
+    const album = await this.albumService.getAlbum(albumId);
 
     if (!album) {
-      throw new UnprocessableEntityException('Album not found');
+      throw new UnprocessableEntityException("Album doesn't exist");
     }
 
-    this.favouriteService.addAlbumToFavs(albumId);
+    await this.favouriteService.addAlbumToFavs(albumId);
   }
 
   @Delete('/album/:id')
   @HttpCode(204)
-  removeAlbumFromFavs(@Param('id') albumId: string): void {
+  public async removeAlbumFromFavs(
+    @Param('id') albumId: string,
+  ): Promise<void> {
     assertValidUuid(albumId);
 
-    const allFavs = this.favouriteService.getAllFavs();
-    const albumToBeDeleted = allFavs.albums.find(
-      (album) => album.id === albumId,
+    const { affected } = await this.favouriteService.removeAlbumFromFavs(
+      albumId,
     );
 
-    if (!albumToBeDeleted) {
-      throw new NotFoundException('Album not found');
+    if (!affected) {
+      throw new NotFoundException("Album doesn't exist");
     }
-
-    this.favouriteService.removeAlbumFromFavs(albumId);
   }
 
   @Post('/artist/:id')
-  addArtistumToFavs(@Param('id') artistId: string): void {
+  public async addArtistToFavs(@Param('id') artistId: string): Promise<void> {
     assertValidUuid(artistId);
 
-    const artist = this.artistService.getArtist(artistId);
+    const artist = await this.artistService.getArtist(artistId);
 
     if (!artist) {
-      throw new UnprocessableEntityException('Artist not found');
+      throw new UnprocessableEntityException("Artist doesn't exist");
     }
 
-    this.favouriteService.addArtistToFavs(artistId);
+    await this.favouriteService.addArtistToFavs(artistId);
   }
 
   @Delete('/artist/:id')
   @HttpCode(204)
-  removeArtistFromFavs(@Param('id') artistId: string): void {
+  public async removeArtistFromFavs(
+    @Param('id') artistId: string,
+  ): Promise<void> {
     assertValidUuid(artistId);
 
-    const allFavs = this.favouriteService.getAllFavs();
-    const artistToBeDeleted = allFavs.artists.find(
-      (artist) => artist.id === artistId,
+    const { affected } = await this.favouriteService.removeArtistFromFavs(
+      artistId,
     );
 
-    if (!artistToBeDeleted) {
-      throw new NotFoundException('Artist not found');
+    if (!affected) {
+      throw new NotFoundException("Artist doesn't exist");
     }
-
-    this.favouriteService.removeArtistFromFavs(artistId);
   }
 }
