@@ -60,18 +60,15 @@ export class TrackController {
     return await this.trackService.updateTrack(trackId, updateTrackDto);
   }
 
-  // TODO Make work with TypeORM after implementing repository for Favs
   @Delete(':id')
   @HttpCode(204)
   public async deleteTrack(@Param('id') trackId: string): Promise<void> {
     assertValidUuid(trackId);
 
-    const track = await this.trackService.getTrack(trackId);
+    const { affected } = await this.trackService.deleteTrack(trackId);
 
-    if (!track) {
-      throw new NotFoundException('Track not found');
+    if (!affected) {
+      throw new NotFoundException("Track doesn't exist");
     }
-
-    await this.trackService.deleteTrack(trackId);
   }
 }

@@ -3,7 +3,7 @@ import { DatabaseService } from '../database/database.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackEntity } from './track.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -44,8 +44,7 @@ export class TrackService {
     });
   }
 
-  public async deleteTrack(trackId: string): Promise<void> {
-    this.databaseService.removeTrackFromFavs(trackId);
-    this.databaseService.deleteTrack(trackId);
+  public async deleteTrack(trackId: string): Promise<DeleteResult> {
+    return await this.trackRepository.delete(trackId);
   }
 }
