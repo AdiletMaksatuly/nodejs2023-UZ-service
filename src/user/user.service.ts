@@ -18,16 +18,32 @@ export class UserService {
     return await this.usersRepository.find();
   }
 
-  public async getUser(userId: string): Promise<UserEntity | null> {
-    return await this.usersRepository.findOneBy({
-      id: userId,
+  public async getUser(
+    userId: string,
+    withPassword = false,
+  ): Promise<UserEntity | null> {
+    const userPropsWithoutPassword: Array<keyof UserEntity> = [
+      'id',
+      'login',
+      'version',
+      'createdAt',
+      'updatedAt',
+    ];
+
+    return await this.usersRepository.findOne({
+      where: { id: userId },
+      select: withPassword
+        ? [...userPropsWithoutPassword, 'password']
+        : userPropsWithoutPassword,
     });
   }
 
   public async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const createdUser = this.usersRepository.create(createUserDto);
 
-    return await this.usersRepository.save(createdUser);
+    const savedUser = await this.usersRepository.save(createdUser);
+
+    return await this.getUser(savedUser.id);
   }
 
   public async updateUser(
@@ -36,10 +52,12 @@ export class UserService {
   ): Promise<UserEntity> {
     const user = await this.getUser(userId);
 
-    return await this.usersRepository.save({
+    const savedUser = await this.usersRepository.save({
       ...user,
       password: updatePasswordDto.newPassword,
     });
+
+    return await this.getUser(savedUser.id);
   }
 
   public async deleteUser(userId: string): Promise<DeleteResult> {

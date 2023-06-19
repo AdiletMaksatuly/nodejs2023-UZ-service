@@ -52,7 +52,7 @@ export class UserController {
   ): Promise<UserEntity> {
     assertValidUuid(userId);
 
-    const user = await this.userService.getUser(userId);
+    const user = await this.userService.getUser(userId, true);
 
     if (!user) {
       throw new NotFoundException('User not found');
