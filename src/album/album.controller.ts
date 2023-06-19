@@ -10,22 +10,22 @@ import {
   Put,
 } from '@nestjs/common';
 import { AlbumService } from '../album/album.service';
-import { Album } from '../album/album.interface';
 import { assertValidUuid } from '../util/assert-valid-uuid.util';
 import { CreateAlbumDto } from '../album/dto/create-album.dto';
 import { UpdateAlbumDto } from '../album/dto/update-album.dto';
+import { AlbumEntity } from './album.entity';
 
 @Controller('album')
 export class AlbumController {
   constructor(private albumService: AlbumService) {}
 
   @Get()
-  getAlbums(): Album[] {
+  public async getAlbums(): Promise<AlbumEntity[]> {
     return this.albumService.getAlbums();
   }
 
   @Get(':id')
-  getAlbum(@Param('id') albumId: string): Album {
+  public async getAlbum(@Param('id') albumId: string): Promise<AlbumEntity> {
     assertValidUuid(albumId);
 
     const album = this.albumService.getAlbum(albumId);
@@ -38,15 +38,17 @@ export class AlbumController {
   }
 
   @Post()
-  createAlbum(@Body() createAlbumDto: CreateAlbumDto): Album {
+  public async createAlbum(
+    @Body() createAlbumDto: CreateAlbumDto,
+  ): Promise<AlbumEntity> {
     return this.albumService.createAlbum(createAlbumDto);
   }
 
   @Put(':id')
-  updateAlbum(
+  public async updateAlbum(
     @Param('id') albumId: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
-  ): Album {
+  ): Promise<AlbumEntity> {
     assertValidUuid(albumId);
 
     const album = this.albumService.getAlbum(albumId);
@@ -58,9 +60,10 @@ export class AlbumController {
     return this.albumService.updateAlbum(albumId, updateAlbumDto);
   }
 
+  // TODO: Make work with TypeORM after implementing repository for Favs
   @Delete(':id')
   @HttpCode(204)
-  public deleteAlbum(@Param('id') albumId: string): void {
+  public async deleteAlbum(@Param('id') albumId: string): Promise<void> {
     assertValidUuid(albumId);
 
     const album = this.albumService.getAlbum(albumId);
@@ -69,6 +72,6 @@ export class AlbumController {
       throw new NotFoundException('Album not found');
     }
 
-    this.albumService.deleteAlbum(albumId);
+    await this.albumService.deleteAlbum(albumId);
   }
 }

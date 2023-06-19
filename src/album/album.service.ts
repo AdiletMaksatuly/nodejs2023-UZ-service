@@ -1,30 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { Album } from '../album/album.interface';
 import { CreateAlbumDto } from '../album/dto/create-album.dto';
 import { UpdateAlbumDto } from '../album/dto/update-album.dto';
+import { AlbumEntity } from './album.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AlbumService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(
+    private databaseService: DatabaseService,
+    @InjectRepository(AlbumEntity)
+    private albumsRepository: Repository<AlbumEntity>,
+  ) {}
 
-  getAlbums(): Album[] {
-    return this.databaseService.findAllAlbums();
+  public async getAlbums(): Promise<AlbumEntity[]> {
+    return await this.albumsRepository.find();
   }
 
-  getAlbum(albumId: string): Album {
-    return this.databaseService.findAlbum(albumId);
+  public async getAlbum(albumId: string): Promise<AlbumEntity> {
+    return await this.albumsRepository.findOneBy({
+      id: albumId,
+    });
   }
 
-  createAlbum(createAlbumDto: CreateAlbumDto): Album {
-    return this.databaseService.createAlbum(createAlbumDto);
+  public async createAlbum(
+    createAlbumDto: CreateAlbumDto,
+  ): Promise<AlbumEntity> {
+    const createdAlbum = this.albumsRepository.create(createAlbumDto);
+
+    return await this.albumsRepository.save(createdAlbum);
   }
 
-  updateAlbum(albumId: string, updateAlbumDto: UpdateAlbumDto): Album {
-    return this.databaseService.updateAlbum(albumId, updateAlbumDto);
+  public async updateAlbum(
+    albumId: string,
+    updateAlbumDto: UpdateAlbumDto,
+  ): Promise<AlbumEntity> {
+    const album = await this.getAlbum(albumId);
+
+    return await this.albumsRepository.save({
+      ...album,
+      ...updateAlbumDto,
+    });
   }
 
-  deleteAlbum(albumId: string): void {
+  public async deleteAlbum(albumId: string): Promise<void> {
     const tracks = this.databaseService.findAllTracks();
 
     tracks.forEach((track) => {
