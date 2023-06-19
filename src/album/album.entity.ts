@@ -22,7 +22,6 @@ export class AlbumEntity implements Album {
   @Column({ name: 'artist_id', type: 'uuid', default: null })
   artistId: string | null;
 
-  // TODO After implementing Delete Artist logic, check if artistId is null after deleting artist
   @ManyToOne(() => ArtistEntity, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'artist_id', referencedColumnName: 'id' })
   artist: ArtistEntity;

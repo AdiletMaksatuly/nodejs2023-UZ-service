@@ -60,18 +60,15 @@ export class ArtistController {
     return await this.artistService.updateArtist(artistId, updateArtistDto);
   }
 
-  // TODO - Make work with TypeORM after implementing repositories for Tracks, Albums and Favs
   @Delete(':id')
   @HttpCode(204)
   public async deleteArtist(@Param('id') artistId: string): Promise<void> {
     assertValidUuid(artistId);
 
-    const artist = this.artistService.getArtist(artistId);
+    const { affected } = await this.artistService.deleteArtist(artistId);
 
-    if (!artist) {
-      throw new NotFoundException('Artist not found');
+    if (!affected) {
+      throw new NotFoundException("Artist doesn't exist");
     }
-
-    await this.artistService.deleteArtist(artistId);
   }
 }

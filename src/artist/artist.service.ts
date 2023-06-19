@@ -3,7 +3,7 @@ import { DatabaseService } from '../database/database.service';
 import { CreateArtistDto } from '../artist/dto/create-artist.dto';
 import { UpdateArtistDto } from '../artist/dto/update-artist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { ArtistEntity } from './artist.entity';
 
 @Injectable()
@@ -44,29 +44,7 @@ export class ArtistService {
     });
   }
 
-  public async deleteArtist(artistId: string): Promise<void> {
-    const tracks = this.databaseService.findAllTracks();
-    const albums = this.databaseService.findAllAlbums();
-
-    tracks.forEach((track) => {
-      if (track.artistId === artistId) {
-        this.databaseService.updateTrack(track.id, {
-          ...track,
-          artistId: null,
-        });
-      }
-    });
-
-    albums.forEach((album) => {
-      if (album.artistId === artistId) {
-        this.databaseService.updateAlbum(album.id, {
-          ...album,
-          artistId: null,
-        });
-      }
-    });
-
-    this.databaseService.removeArtistFromFavs(artistId);
-    this.databaseService.deleteArtist(artistId);
+  public async deleteArtist(artistId: string): Promise<DeleteResult> {
+    return await this.artistsRepository.delete(artistId);
   }
 }
