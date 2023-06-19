@@ -4,7 +4,7 @@ import { CreateAlbumDto } from '../album/dto/create-album.dto';
 import { UpdateAlbumDto } from '../album/dto/update-album.dto';
 import { AlbumEntity } from './album.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()
 export class AlbumService {
@@ -44,20 +44,7 @@ export class AlbumService {
     });
   }
 
-  public async deleteAlbum(albumId: string): Promise<void> {
-    const tracks = this.databaseService.findAllTracks();
-
-    tracks.forEach((track) => {
-      if (track.albumId === albumId) {
-        this.databaseService.updateTrack(track.id, {
-          ...track,
-          albumId: null,
-        });
-      }
-    });
-
-    this.databaseService.removeAlbumFromFavs(albumId);
-
-    this.databaseService.deleteAlbum(albumId);
+  public async deleteAlbum(albumId: string): Promise<DeleteResult> {
+    return await this.albumsRepository.delete(albumId);
   }
 }

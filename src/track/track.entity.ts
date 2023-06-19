@@ -31,7 +31,6 @@ export class TrackEntity implements Track {
   @JoinColumn({ name: 'artist_id', referencedColumnName: 'id' })
   artist: ArtistEntity;
 
-  // TODO check if this works after implementing delete album
   @ManyToOne(() => AlbumEntity, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'album_id', referencedColumnName: 'id' })
   album: AlbumEntity;

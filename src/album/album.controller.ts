@@ -60,18 +60,15 @@ export class AlbumController {
     return this.albumService.updateAlbum(albumId, updateAlbumDto);
   }
 
-  // TODO: Make work with TypeORM after implementing repository for Favs
   @Delete(':id')
   @HttpCode(204)
   public async deleteAlbum(@Param('id') albumId: string): Promise<void> {
     assertValidUuid(albumId);
 
-    const album = this.albumService.getAlbum(albumId);
+    const { affected } = await this.albumService.deleteAlbum(albumId);
 
-    if (!album) {
+    if (!affected) {
       throw new NotFoundException('Album not found');
     }
-
-    await this.albumService.deleteAlbum(albumId);
   }
 }
