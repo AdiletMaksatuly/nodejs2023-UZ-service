@@ -1,30 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { Artist } from './artist.interface';
 import { CreateArtistDto } from '../artist/dto/create-artist.dto';
 import { UpdateArtistDto } from '../artist/dto/update-artist.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ArtistEntity } from './artist.entity';
 
 @Injectable()
 export class ArtistService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(
+    private databaseService: DatabaseService,
+    @InjectRepository(ArtistEntity)
+    private artistsRepository: Repository<ArtistEntity>,
+  ) {}
 
-  getArtists(): Artist[] {
-    return this.databaseService.findAllArtists();
+  public async getArtists(): Promise<ArtistEntity[]> {
+    return await this.artistsRepository.find();
   }
 
-  getArtist(artistId: string): Artist {
-    return this.databaseService.findArtist(artistId);
+  public async getArtist(artistId: string): Promise<ArtistEntity> {
+    return await this.artistsRepository.findOneBy({
+      id: artistId,
+    });
   }
 
-  createArtist(createArtistDto: CreateArtistDto): Artist {
-    return this.databaseService.createArtist(createArtistDto);
+  public async createArtist(
+    createArtistDto: CreateArtistDto,
+  ): Promise<ArtistEntity> {
+    const createdArtist = this.artistsRepository.create(createArtistDto);
+
+    return await this.artistsRepository.save(createdArtist);
   }
 
-  updateArtist(artistId: string, updateArtistDto: UpdateArtistDto): Artist {
-    return this.databaseService.updateArtist(artistId, updateArtistDto);
+  public async updateArtist(
+    artistId: string,
+    updateArtistDto: UpdateArtistDto,
+  ): Promise<ArtistEntity> {
+    const artist = await this.getArtist(artistId);
+
+    return await this.artistsRepository.save({
+      ...artist,
+      ...updateArtistDto,
+    });
   }
 
-  deleteArtist(artistId: string): void {
+  public async deleteArtist(artistId: string): Promise<void> {
     const tracks = this.databaseService.findAllTracks();
     const albums = this.databaseService.findAllAlbums();
 
