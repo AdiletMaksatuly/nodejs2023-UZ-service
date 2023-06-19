@@ -1,30 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { Track } from './track.interface';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { TrackEntity } from './track.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TrackService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(
+    private databaseService: DatabaseService,
+    @InjectRepository(TrackEntity)
+    private trackRepository: Repository<TrackEntity>,
+  ) {}
 
-  getTracks(): Track[] {
-    return this.databaseService.findAllTracks();
+  public async getTracks(): Promise<TrackEntity[]> {
+    return await this.trackRepository.find();
   }
 
-  getTrack(trackId: string): Track {
-    return this.databaseService.findTrack(trackId);
+  public async getTrack(trackId: string): Promise<TrackEntity> {
+    return await this.trackRepository.findOneBy({
+      id: trackId,
+    });
   }
 
-  createTrack(createTrackDto: CreateTrackDto): Track {
-    return this.databaseService.createTrack(createTrackDto);
+  public async createTrack(
+    createTrackDto: CreateTrackDto,
+  ): Promise<TrackEntity> {
+    const createdTrack = this.trackRepository.create(createTrackDto);
+
+    return await this.trackRepository.save(createdTrack);
   }
 
-  updateTrack(trackId: string, updateTrackDto: UpdateTrackDto): Track {
-    return this.databaseService.updateTrack(trackId, updateTrackDto);
+  public async updateTrack(
+    trackId: string,
+    updateTrackDto: UpdateTrackDto,
+  ): Promise<TrackEntity> {
+    const track = await this.getTrack(trackId);
+
+    return await this.trackRepository.save({
+      ...track,
+      ...updateTrackDto,
+    });
   }
 
-  deleteTrack(trackId: string): void {
+  public async deleteTrack(trackId: string): Promise<void> {
     this.databaseService.removeTrackFromFavs(trackId);
     this.databaseService.deleteTrack(trackId);
   }

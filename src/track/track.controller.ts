@@ -10,25 +10,25 @@ import {
   Put,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
-import { Track } from './track.interface';
 import { assertValidUuid } from '../util/assert-valid-uuid.util';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { TrackEntity } from './track.entity';
 
 @Controller('track')
 export class TrackController {
   constructor(private trackService: TrackService) {}
 
   @Get()
-  getTracks(): Track[] {
-    return this.trackService.getTracks();
+  public async getTracks(): Promise<TrackEntity[]> {
+    return await this.trackService.getTracks();
   }
 
   @Get(':id')
-  getTrack(@Param('id') trackId: string): Track {
+  public async getTrack(@Param('id') trackId: string): Promise<TrackEntity> {
     assertValidUuid(trackId);
 
-    const track = this.trackService.getTrack(trackId);
+    const track = await this.trackService.getTrack(trackId);
 
     if (!track) {
       throw new NotFoundException('Track not found');
@@ -38,37 +38,40 @@ export class TrackController {
   }
 
   @Post()
-  createTrack(@Body() createTrackDto: CreateTrackDto): Track {
-    return this.trackService.createTrack(createTrackDto);
+  public async createTrack(
+    @Body() createTrackDto: CreateTrackDto,
+  ): Promise<TrackEntity> {
+    return await this.trackService.createTrack(createTrackDto);
   }
 
   @Put(':id')
-  updateTrack(
+  public async updateTrack(
     @Param('id') trackId: string,
     @Body() updateTrackDto: UpdateTrackDto,
-  ): Track {
+  ): Promise<TrackEntity> {
     assertValidUuid(trackId);
 
-    const track = this.trackService.getTrack(trackId);
+    const track = await this.trackService.getTrack(trackId);
 
     if (!track) {
       throw new NotFoundException('Track not found');
     }
 
-    return this.trackService.updateTrack(trackId, updateTrackDto);
+    return await this.trackService.updateTrack(trackId, updateTrackDto);
   }
 
+  // TODO Make work with TypeORM after implementing repository for Favs
   @Delete(':id')
   @HttpCode(204)
-  public deleteTrack(@Param('id') trackId: string): void {
+  public async deleteTrack(@Param('id') trackId: string): Promise<void> {
     assertValidUuid(trackId);
 
-    const track = this.trackService.getTrack(trackId);
+    const track = await this.trackService.getTrack(trackId);
 
     if (!track) {
       throw new NotFoundException('Track not found');
     }
 
-    this.trackService.deleteTrack(trackId);
+    await this.trackService.deleteTrack(trackId);
   }
 }
