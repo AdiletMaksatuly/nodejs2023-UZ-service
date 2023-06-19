@@ -1,54 +1,48 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { User, UserWithoutPassword } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
-import { removeProperty } from '../util/remove-property.util';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { DeleteResult, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    @InjectRepository(UserEntity)
+    private usersRepository: Repository<UserEntity>,
+  ) {}
 
-  getUsers(): UserWithoutPassword[] {
-    const users = this.databaseService.findAllUsers();
-
-    return users.map((user) => this.removePasswordFromUser(user));
+  public async getUsers(): Promise<UserEntity[]> {
+    return await this.usersRepository.find();
   }
 
-  getUser(userId: string): UserWithoutPassword | null {
-    const user = this.databaseService.findUser(userId);
-
-    if (!user) return null;
-
-    return this.removePasswordFromUser(user);
+  public async getUser(userId: string): Promise<UserEntity | null> {
+    return await this.usersRepository.findOneBy({
+      id: userId,
+    });
   }
 
-  createUser(createUserDto: CreateUserDto): UserWithoutPassword {
-    return this.removePasswordFromUser(
-      this.databaseService.createUser(createUserDto),
-    );
+  public async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const createdUser = this.usersRepository.create(createUserDto);
+
+    return await this.usersRepository.save(createdUser);
   }
 
-  updateUser(
+  public async updateUser(
     userId: string,
     updatePasswordDto: UpdatePasswordDto,
-  ): UserWithoutPassword {
-    const user = this.databaseService.findUser(userId);
+  ): Promise<UserEntity> {
+    const user = await this.getUser(userId);
 
-    if (user.password !== updatePasswordDto.oldPassword) {
-      throw new ForbiddenException('Invalid old password');
-    }
-
-    return this.removePasswordFromUser(
-      this.databaseService.updateUser(userId, updatePasswordDto),
-    );
+    return await this.usersRepository.save({
+      ...user,
+      password: updatePasswordDto.newPassword,
+    });
   }
 
-  deleteUser(userId: string): void {
-    this.databaseService.deleteUser(userId);
-  }
-
-  private removePasswordFromUser(user: User): UserWithoutPassword {
-    return removeProperty(user, 'password');
+  public async deleteUser(userId: string): Promise<DeleteResult> {
+    return await this.usersRepository.delete(userId);
   }
 }

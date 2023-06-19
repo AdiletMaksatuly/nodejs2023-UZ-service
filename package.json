@@ -20,7 +20,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "prepare": "husky install",
-    "scan": "docker scan nodejs2023-uz-service-app:latest && docker scan nodejs2023-uz-service-postgres:latest"
+    "scan": "docker scan nodejs2023-uz-service-app:latest && docker scan nodejs2023-uz-service-postgres:latest",
+    "migration:create": "npx typeorm migration:create",
+    "migration:generate": "npm run build && npx typeorm -d dist/database/orm.config.js migration:generate",
+    "migration:run": "npm run build && npx typeorm -d dist/database/orm.config.js migration:run --transaction each",
+    "migration:revert": "npm run build && npx typeorm -d dist/database/orm.config.js migration:revert"
   },
   "lint-staged": {
     "*.{js,ts,json,css,scss,md}": [

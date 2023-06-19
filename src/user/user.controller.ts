@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -10,25 +11,25 @@ import {
   Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserWithoutPassword } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { assertValidUuid } from '../util/assert-valid-uuid.util';
+import { UserEntity } from './user.entity';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  public getAllUsers(): UserWithoutPassword[] {
-    return this.userService.getUsers();
+  public async getAllUsers(): Promise<UserEntity[]> {
+    return await this.userService.getUsers();
   }
 
   @Get(':id')
-  public getUser(@Param('id') userId: string): UserWithoutPassword {
+  public async getUser(@Param('id') userId: string): Promise<UserEntity> {
     assertValidUuid(userId);
 
-    const user = this.userService.getUser(userId);
+    const user = await this.userService.getUser(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -38,37 +39,41 @@ export class UserController {
   }
 
   @Post()
-  public createUser(@Body() createUserDto: CreateUserDto): UserWithoutPassword {
-    return this.userService.createUser(createUserDto);
+  public async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<UserEntity> {
+    return await this.userService.createUser(createUserDto);
   }
 
   @Put(':id')
-  public updateUser(
+  public async updateUser(
     @Param('id') userId: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ): UserWithoutPassword {
+  ): Promise<UserEntity> {
     assertValidUuid(userId);
 
-    const user = this.userService.getUser(userId);
+    const user = await this.userService.getUser(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    return this.userService.updateUser(userId, updatePasswordDto);
+    if (user.password !== updatePasswordDto.oldPassword) {
+      throw new ForbiddenException('Invalid old password');
+    }
+
+    return await this.userService.updateUser(userId, updatePasswordDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  public deleteUser(@Param('id') userId: string): void {
+  public async deleteUser(@Param('id') userId: string): Promise<void> {
     assertValidUuid(userId);
 
-    const user = this.userService.getUser(userId);
+    const { affected } = await this.userService.deleteUser(userId);
 
-    if (!user) {
-      throw new NotFoundException('User not found');
+    if (affected === 0) {
+      throw new NotFoundException("User doesn't exist");
     }
-
-    this.userService.deleteUser(userId);
   }
 }
