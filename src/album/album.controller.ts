@@ -28,7 +28,7 @@ export class AlbumController {
   public async getAlbum(@Param('id') albumId: string): Promise<AlbumEntity> {
     assertValidUuid(albumId);
 
-    const album = this.albumService.getAlbum(albumId);
+    const album = await this.albumService.getAlbum(albumId);
 
     if (!album) {
       throw new NotFoundException('Album not found');
@@ -51,7 +51,7 @@ export class AlbumController {
   ): Promise<AlbumEntity> {
     assertValidUuid(albumId);
 
-    const album = this.albumService.getAlbum(albumId);
+    const album = await this.albumService.getAlbum(albumId);
 
     if (!album) {
       throw new NotFoundException('Album not found');
