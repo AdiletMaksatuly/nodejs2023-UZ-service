@@ -104,7 +104,7 @@ export class Init1687202789400 implements MigrationInterface {
             type: 'integer',
           },
           {
-            name: 'artistId',
+            name: 'artist_id',
             type: 'uuid',
             isNullable: true,
           },
