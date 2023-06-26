@@ -5,10 +5,18 @@ import { LogColors } from '../consts/log-colors.const';
 import { LogLevels } from '../consts/log-levels.const';
 import { LogLevel } from '../models/log-level.type';
 import { LogColor } from '../models/log-color.type';
+import { join } from 'path';
+import { LOGS_DIR } from '../consts/log-dir.const';
+import { appendFile, writeFile } from 'fs/promises';
+import { doesFileExist } from '../utils/doesFileExist.util';
 
 @Injectable()
 export class LogService implements LoggerService {
   private readonly LEVEL;
+
+  private logFileDir = join(process.cwd(), LOGS_DIR);
+
+  private logFilePath = join(this.logFileDir, `${Date.now()}.log`);
 
   constructor(private configService: ConfigService) {
     this.LEVEL = this.configService.get<number>('log.logLevel');
@@ -18,34 +26,40 @@ export class LogService implements LoggerService {
         'Log level must be between 1 and 3 [1 = error, 2 = warn, 3 = log, 4 = verbose]',
       );
     }
+
+    this.createLogFile();
   }
 
-  public error(logInfo: LogInfo): void {
-    this.printLog(LogLevels.ERROR, logInfo);
+  public async error(logInfo: LogInfo): Promise<void> {
+    await this.printLog(LogLevels.ERROR, logInfo);
   }
 
-  public warn(logInfo: LogInfo): void {
+  public async warn(logInfo: LogInfo): Promise<void> {
     if (this.LEVEL < 2) return;
 
-    this.printLog(LogLevels.WARN, logInfo);
+    await this.printLog(LogLevels.WARN, logInfo);
   }
 
-  public log(logInfo: LogInfo | string): void {
+  public async log(logInfo: LogInfo | string): Promise<void> {
     if (this.LEVEL < 3) return;
 
-    this.printLog(LogLevels.LOG, logInfo);
+    await this.printLog(LogLevels.LOG, logInfo);
   }
 
-  public verbose(logInfo: LogInfo): void {
+  public async verbose(logInfo: LogInfo): Promise<void> {
     if (this.LEVEL < 4) return;
 
-    this.printLog(LogLevels.VERBOSE, logInfo);
+    await this.printLog(LogLevels.VERBOSE, logInfo);
   }
 
-  private printLog(level: LogLevel, logInfo: LogInfo): void {
+  private async printLog(level: LogLevel, logInfo: LogInfo): Promise<void> {
     const color = this.defineColor(level);
 
-    console.log(this.generateMessage(logInfo, level, color));
+    const message = this.generateMessage(logInfo, level, color);
+
+    console.log(message);
+
+    await this.saveLogToFile(message);
   }
 
   private getCurrentTimeString(): string {
@@ -83,5 +97,21 @@ export class LogService implements LoggerService {
         : `${logInfo.method} ${logInfo.url} ${logInfo.statusCode} Query params: ${LogColors.Yellow}${logInfo.query}, ${color}Body: ${LogColors.Yellow}${logInfo.body} ${LogColors.Yellow}+${logInfo.ms}ms`;
 
     return `${color}[APP] ${PID} - ${LogColors.Regular}${currentTime} ${color}${level} ${message}`;
+  }
+
+  private async createLogFile(): Promise<void> {
+    this.logFilePath = join(this.logFileDir, `${Date.now()}.log`);
+
+    await writeFile(this.logFilePath, 'APP LOGS\n');
+  }
+
+  private async saveLogToFile(message: string): Promise<void> {
+    const doesLogFileExist = await doesFileExist(this.logFilePath);
+
+    if (!doesLogFileExist) {
+      await this.createLogFile();
+    }
+
+    await appendFile(this.logFilePath, message + '\n');
   }
 }
