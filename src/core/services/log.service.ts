@@ -9,10 +9,13 @@ import { join } from 'path';
 import { LOGS_DIR } from '../consts/log-dir.const';
 import { appendFile, mkdir, writeFile } from 'fs/promises';
 import { doesResourceExist } from '../utils/doesFileExist.util';
+import { isFileSizeOK } from '../utils/isFileSizeOk.util';
 
 @Injectable()
 export class LogService implements LoggerService {
   private readonly LEVEL;
+
+  private readonly maxFileSize: number;
 
   private logFileDir = join(process.cwd(), LOGS_DIR);
 
@@ -25,6 +28,7 @@ export class LogService implements LoggerService {
 
   constructor(private configService: ConfigService) {
     this.LEVEL = this.configService.get<number>('log.logLevel');
+    this.maxFileSize = this.configService.get<number>('logger.maxFileSize');
 
     if (this.LEVEL < 1 || this.LEVEL > 4) {
       throw new Error(
@@ -142,7 +146,9 @@ export class LogService implements LoggerService {
 
     const doesLogFileExist = await doesResourceExist(logFilePath);
 
-    if (!doesLogFileExist) {
+    const isFileSizeOk = await isFileSizeOK(logFilePath, this.maxFileSize);
+
+    if (!doesLogFileExist || !isFileSizeOk) {
       isError ? await this.createErrorLogFile() : await this.createLogFile();
     }
 
