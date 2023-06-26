@@ -1,8 +1,8 @@
 import { access } from 'fs/promises';
 
-export const doesFileExist = async (filePath: string): Promise<boolean> => {
+export const doesResourceExist = async (path: string): Promise<boolean> => {
   try {
-    await access(filePath);
+    await access(path);
 
     return true;
   } catch (error: unknown) {

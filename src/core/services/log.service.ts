@@ -7,8 +7,8 @@ import { LogLevel } from '../models/log-level.type';
 import { LogColor } from '../models/log-color.type';
 import { join } from 'path';
 import { LOGS_DIR } from '../consts/log-dir.const';
-import { appendFile, writeFile } from 'fs/promises';
-import { doesFileExist } from '../utils/doesFileExist.util';
+import { appendFile, mkdir, writeFile } from 'fs/promises';
+import { doesResourceExist } from '../utils/doesFileExist.util';
 
 @Injectable()
 export class LogService implements LoggerService {
@@ -17,6 +17,11 @@ export class LogService implements LoggerService {
   private logFileDir = join(process.cwd(), LOGS_DIR);
 
   private logFilePath = join(this.logFileDir, `${Date.now()}.log`);
+  private errorLogFilePath = join(
+    this.logFileDir,
+    'errors',
+    `${Date.now()}.error.log`,
+  );
 
   constructor(private configService: ConfigService) {
     this.LEVEL = this.configService.get<number>('log.logLevel');
@@ -26,8 +31,6 @@ export class LogService implements LoggerService {
         'Log level must be between 1 and 3 [1 = error, 2 = warn, 3 = log, 4 = verbose]',
       );
     }
-
-    this.createLogFile();
   }
 
   public async error(logInfo: LogInfo): Promise<void> {
@@ -59,7 +62,7 @@ export class LogService implements LoggerService {
 
     console.log(message);
 
-    await this.saveLogToFile(message);
+    await this.saveLogToFile(message, level === LogLevels.ERROR);
   }
 
   private getCurrentTimeString(): string {
@@ -100,18 +103,45 @@ export class LogService implements LoggerService {
   }
 
   private async createLogFile(): Promise<void> {
+    const doesDirExist = await doesResourceExist(this.logFileDir);
+
+    if (!doesDirExist) {
+      await mkdir(this.logFileDir);
+    }
+
     this.logFilePath = join(this.logFileDir, `${Date.now()}.log`);
 
     await writeFile(this.logFilePath, 'APP LOGS\n');
   }
 
-  private async saveLogToFile(message: string): Promise<void> {
-    const doesLogFileExist = await doesFileExist(this.logFilePath);
+  private async createErrorLogFile(): Promise<void> {
+    const doesDirExist = await doesResourceExist(this.logFileDir);
 
-    if (!doesLogFileExist) {
-      await this.createLogFile();
+    if (!doesDirExist) {
+      await mkdir(this.logFileDir);
     }
 
-    await appendFile(this.logFilePath, message + '\n');
+    this.errorLogFilePath = join(
+      this.logFileDir,
+      'errors',
+      `${Date.now()}.error.log`,
+    );
+
+    await writeFile(this.errorLogFilePath, 'APP ERROR LOGS\n');
+  }
+
+  private async saveLogToFile(
+    message: string,
+    isError: boolean,
+  ): Promise<void> {
+    const logFilePath = isError ? this.errorLogFilePath : this.logFilePath;
+
+    const doesLogFileExist = await doesResourceExist(logFilePath);
+
+    if (!doesLogFileExist) {
+      isError ? await this.createErrorLogFile() : await this.createLogFile();
+    }
+
+    await appendFile(logFilePath, message + '\n');
   }
 }
