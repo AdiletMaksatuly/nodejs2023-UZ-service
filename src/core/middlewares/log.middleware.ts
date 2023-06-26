@@ -6,6 +6,10 @@ import { BaseLogInfo } from '../log-info.interface';
 export class LogMiddleware implements NestMiddleware {
   private logger = new Logger(LogMiddleware.name);
 
+  private CLIENT_ERROR_STATUS_CODE = 400;
+
+  private SERVER_ERROR_STATUS_CODE = 500;
+
   use(req: Request, res: Response, next: NextFunction) {
     const start = Date.now();
 
@@ -23,23 +27,39 @@ export class LogMiddleware implements NestMiddleware {
     req: Request;
     res: Response;
   }): void {
-    const { url, method } = req;
+    const { url, method, query, body } = req;
 
     const { statusCode } = res;
 
     const message: BaseLogInfo = {
       method,
       url,
+      query: JSON.stringify(query),
+      body: JSON.stringify(body),
       statusCode,
       ms: Date.now() - start,
     };
 
-    if (statusCode < 400) {
-      this.logger.log(message);
-    } else if (statusCode < 500) {
-      this.logger.warn(message);
-    } else {
-      this.logger.error(message);
+    switch (true) {
+      case this.isClientError(statusCode):
+        this.logger.warn(message);
+        break;
+      case this.isServerError(statusCode):
+        this.logger.error(message);
+        break;
+      default:
+        this.logger.log(message);
     }
+  }
+
+  private isClientError(statusCode: number): boolean {
+    return (
+      statusCode >= this.CLIENT_ERROR_STATUS_CODE &&
+      statusCode < this.SERVER_ERROR_STATUS_CODE
+    );
+  }
+
+  private isServerError(statusCode: number): boolean {
+    return statusCode >= this.SERVER_ERROR_STATUS_CODE;
   }
 }

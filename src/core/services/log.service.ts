@@ -80,7 +80,7 @@ export class LogService implements LoggerService {
     const message =
       typeof logInfo === 'string'
         ? logInfo
-        : `${logInfo.method} ${logInfo.url} ${logInfo.statusCode} ${LogColors.Yellow}+${logInfo.ms}ms`;
+        : `${logInfo.method} ${logInfo.url} ${logInfo.statusCode} Query params: ${LogColors.Yellow}${logInfo.query}, ${color}Body: ${LogColors.Yellow}${logInfo.body} ${LogColors.Yellow}+${logInfo.ms}ms`;
 
     return `${color}[APP] ${PID} - ${LogColors.Regular}${currentTime} ${color}${level} ${message}`;
   }
