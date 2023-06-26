@@ -10,25 +10,25 @@ import {
   Put,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
-import { Artist } from './artist.interface';
 import { assertValidUuid } from '../util/assert-valid-uuid.util';
 import { CreateArtistDto } from '../artist/dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { ArtistEntity } from './artist.entity';
 
 @Controller('artist')
 export class ArtistController {
   constructor(private artistService: ArtistService) {}
 
   @Get()
-  getArtists(): Artist[] {
+  public async getArtists(): Promise<ArtistEntity[]> {
     return this.artistService.getArtists();
   }
 
   @Get(':id')
-  public getArtist(@Param('id') artistId: string): Artist {
+  public async getArtist(@Param('id') artistId: string): Promise<ArtistEntity> {
     assertValidUuid(artistId);
 
-    const artist = this.artistService.getArtist(artistId);
+    const artist = await this.artistService.getArtist(artistId);
 
     if (!artist) {
       throw new NotFoundException('Artist not found');
@@ -38,37 +38,37 @@ export class ArtistController {
   }
 
   @Post()
-  public createArtist(@Body() createArtistDto: CreateArtistDto): Artist {
+  public async createArtist(
+    @Body() createArtistDto: CreateArtistDto,
+  ): Promise<ArtistEntity> {
     return this.artistService.createArtist(createArtistDto);
   }
 
   @Put(':id')
-  public updateArtist(
+  public async updateArtist(
     @Param('id') artistId: string,
     @Body() updateArtistDto: UpdateArtistDto,
-  ): Artist {
+  ): Promise<ArtistEntity> {
     assertValidUuid(artistId);
 
-    const artist = this.artistService.getArtist(artistId);
+    const artist = await this.artistService.getArtist(artistId);
 
     if (!artist) {
       throw new NotFoundException('Artist not found');
     }
 
-    return this.artistService.updateArtist(artistId, updateArtistDto);
+    return await this.artistService.updateArtist(artistId, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  public deleteArtist(@Param('id') artistId: string): void {
+  public async deleteArtist(@Param('id') artistId: string): Promise<void> {
     assertValidUuid(artistId);
 
-    const artist = this.artistService.getArtist(artistId);
+    const { affected } = await this.artistService.deleteArtist(artistId);
 
-    if (!artist) {
-      throw new NotFoundException('Artist not found');
+    if (!affected) {
+      throw new NotFoundException("Artist doesn't exist");
     }
-
-    this.artistService.deleteArtist(artistId);
   }
 }
