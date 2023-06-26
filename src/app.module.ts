@@ -9,6 +9,7 @@ import { AlbumModule } from './album/album.module';
 import { FavouriteModule } from './favourite/favourite.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ormConfig } from './database/orm.config';
+import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ormConfig } from './database/orm.config';
     AlbumModule,
     FavouriteModule,
     TypeOrmModule.forRoot(ormConfig.options),
+    CoreModule,
   ],
   controllers: [AppController],
   providers: [AppService],
