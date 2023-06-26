@@ -55,6 +55,10 @@ export class LogService implements LoggerService {
     await this.printLog(LogLevels.VERBOSE, logInfo);
   }
 
+  public async crash(message: string): Promise<void> {
+    await this.printLog(LogLevels.ERROR, message);
+  }
+
   private async printLog(level: LogLevel, logInfo: LogInfo): Promise<void> {
     const color = this.defineColor(level);
 

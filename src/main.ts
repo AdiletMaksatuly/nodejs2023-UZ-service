@@ -5,6 +5,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { LogService } from './core/services/log.service';
+import * as process from 'process';
 
 const initDocs = (app: INestApplication) => {
   const config = new DocumentBuilder()
@@ -20,6 +21,22 @@ const initDocs = (app: INestApplication) => {
   SwaggerModule.setup('doc', app, document);
 };
 
+const listenForUnhandledRejection = (logger: LogService) => {
+  process.on('unhandledRejection', async () => {
+    await logger.crash('Unhandled Rejection occured...');
+
+    process.exit(1);
+  });
+};
+
+const listenForUncaughtException = (logger: LogService) => {
+  process.on('uncaughtException', async () => {
+    await logger.crash('Uncaught Exception occured...');
+
+    process.exit(1);
+  });
+};
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -30,6 +47,9 @@ async function bootstrap() {
   app.useLogger(logger);
 
   app.useGlobalPipes(new ValidationPipe());
+
+  listenForUnhandledRejection(logger);
+  listenForUncaughtException(logger);
 
   initDocs(app);
 
